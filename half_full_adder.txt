@@ -1,0 +1,55 @@
+// Half Adder Implementation
+`timescale 1ns / 1ps
+module HALFADDER(
+    input A, B,
+    output SUM, CARRY
+);
+    assign SUM = A ^ B;            // SUM = A XOR B
+    assign CARRY = A & B;          // CARRY = A AND B
+endmodule
+
+// Half Adder Stimulus (Testbench)
+module STIMULUS();
+    reg A, B;
+    wire SUM, CARRY;
+    HALFADDER uut(A, B, SUM, CARRY);
+    
+    initial begin
+        A = 0; B = 0;   // Test input 00
+        #10 A = 1; B = 0; // Test input 01
+        #10 A = 0; B = 1; // Test input 10
+        #10 A = 1; B = 1; // Test input 11
+        #10 $finish;
+    end
+endmodule
+
+
+// Full Adder Implementation
+`timescale 1ns / 1ps
+module FULLADDER(
+    input A, B, C,
+    output SUM, OUT
+);
+    assign SUM = A ^ B ^ C;        // SUM = A XOR B XOR C
+    assign OUT = (A & B) | (B & C) | (A & C); // OUT = (A AND B) OR (B AND C) OR (A AND C)
+endmodule
+
+
+// Full Adder Stimulus (Testbench)
+module STIMULUS2();
+    reg A, B, C;
+    wire SUM, OUT;
+    FULLADDER uut(A, B, C, SUM, OUT);
+    
+    initial begin
+        A = 0; B = 0; C = 0;  // Test input 000
+        #10 A = 0; B = 0; C = 1;  // Test input 001
+        #10 A = 0; B = 1; C = 0;  // Test input 010
+        #10 A = 1; B = 0; C = 0;  // Test input 100
+        #10 A = 0; B = 1; C = 1;  // Test input 011
+        #10 A = 1; B = 0; C = 1;  // Test input 101
+        #10 A = 1; B = 1; C = 0;  // Test input 110
+        #10 A = 1; B = 1; C = 1;  // Test input 111
+        #10 $finish;
+    end
+endmodule

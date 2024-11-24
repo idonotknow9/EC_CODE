@@ -1,0 +1,55 @@
+// Universal NAND Gate Implementation
+module universalgate(
+    input a, b,
+    output and_out, or_out, not_out, xor_out, xnor_out, nand_out, nor_out
+);
+    assign and_out = ~(~(a & b) & ~(a & b));           // AND gate
+    assign or_out = ~(~(a & a) & ~(b & b));             // OR gate
+    assign not_out = ~(a & a);                          // NOT gate
+    assign xor_out = ~(~(~(a & b) & a) & ~(~(a & b) & b)); // XOR gate
+    assign xnor_out = ~(xor_out & xor_out);             // XNOR gate
+    assign nor_out = ~(or_out & or_out);                // NOR gate
+    assign nand_out = ~(a & b);                         // NAND gate
+endmodule
+
+// Universal NOR Gate Implementation
+module universalgate2(
+    input a, b,
+    output and_out, or_out, not_out, xor_out, xnor_out, nand_out, nor_out
+);
+    assign and_out = ~(~(a | a) | ~(b | b));            // AND gate
+    assign or_out = ~(~(a | b) | ~(a | b));             // OR gate
+    assign not_out = ~(a | a);                          // NOT gate
+    assign xnor_out = ~(~(~(a | b) | a) | ~(~(a | b) | b)); // XNOR gate
+    assign xor_out = ~(xnor_out & xnor_out);           // XOR gate
+    assign nor_out = ~(a | b);                          // NOR gate
+    assign nand_out = ~(and_out | and_out);             // NAND gate
+endmodule
+
+// Testbench for Universal NAND Gate
+module sim2_nand();
+    reg a, b;
+    wire and_out, or_out, not_out, xor_out, xnor_out, nand_out, nor_out;
+    universalgate uut(a, b, and_out, or_out, not_out, xor_out, xnor_out, nand_out, nor_out);
+    initial begin
+        a = 0; b = 0;
+        #10 a = 0; b = 1;
+        #10 a = 1; b = 0;
+        #10 a = 1; b = 1;
+        #10 $finish;
+    end
+endmodule
+
+// Testbench for Universal NOR Gate
+module sim2_nor();
+    reg a, b;
+    wire and_out, or_out, not_out, xor_out, xnor_out, nand_out, nor_out;
+    universalgate2 uut(a, b, and_out, or_out, not_out, xor_out, xnor_out, nand_out, nor_out);
+    initial begin
+        a = 0; b = 0;
+        #10 a = 0; b = 1;
+        #10 a = 1; b = 0;
+        #10 a = 1; b = 1;
+        #10 $finish;
+    end
+endmodule

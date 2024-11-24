@@ -1,0 +1,36 @@
+// Logic Gates Module
+`timescale 1ns / 1ps
+module LOGIC_GATES(
+    input a, b,
+    output and_output, or_output, nand_output, nor_output, not_output, xor_output
+);
+    assign and_output = (a & b);         // AND gate
+    assign or_output = (a | b);          // OR gate
+    assign nand_output = ~(a & b);       // NAND gate
+    assign nor_output = ~(a | b);        // NOR gate
+    assign not_output = ~a;              // NOT gate (inverts a)
+    assign xor_output = (a ^ b);         // XOR gate
+endmodule
+
+// Testbench (Stimulus)
+module STIMULUS();
+    reg a, b;  // Declaring registers for input signals
+    wire and_output, or_output, nand_output, nor_output, not_output, xor_output;  // Declaring wires for output signals
+
+    // Instantiating the LOGIC_GATES module
+    LOGIC_GATES uut(
+        .a(a), .b(b),
+        .and_output(and_output), .or_output(or_output),
+        .nand_output(nand_output), .nor_output(nor_output),
+        .not_output(not_output), .xor_output(xor_output)
+    );
+
+    // Initial block for applying test vectors
+    initial begin
+        a = 0; b = 0;   // Initial values of a and b
+        #10 a = 1; b = 0;  // After 10ns, a=1, b=0
+        #10 a = 0; b = 1;  // After 20ns, a=0, b=1
+        #10 a = 1; b = 1;  // After 30ns, a=1, b=1
+        #10 $finish;       // End simulation after 40ns
+    end
+endmodule
