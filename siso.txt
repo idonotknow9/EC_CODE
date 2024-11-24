@@ -1,0 +1,48 @@
+module SISO_4bit (
+    input clk,         // Clock signal
+    input rst,         // Reset signal
+    input serial_in,   // Serial input
+    output reg serial_out // Serial output
+);
+    reg [3:0] shift_reg; // 4-bit shift register
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            shift_reg <= 4'b0000; // Clear the register on reset
+        end else begin
+            shift_reg <= {shift_reg[2:0], serial_in}; // Shift left and insert serial_in
+            serial_out <= shift_reg[3];              // Output the MSB
+        end
+    end
+endmodule
+
+module tb_SISO_4bit();
+    reg clk, rst, serial_in; // Test bench inputs
+    wire serial_out;         // Test bench output
+
+    // Instantiate the SISO module
+    SISO_4bit uut (
+        .clk(clk),
+        .rst(rst),
+        .serial_in(serial_in),
+        .serial_out(serial_out)
+    );
+
+    // Generate clock signal
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk; // Toggle every 5 time units
+    end
+
+    // Apply test cases
+    initial begin
+        rst = 1; serial_in = 0; #10; // Apply reset
+        rst = 0;                    // Release reset
+        serial_in = 1; #10;         // Apply input sequence
+        serial_in = 0; #10;
+        serial_in = 1; #10;
+        serial_in = 1; #10;
+        serial_in = 0; #40;         // Hold input low
+        $finish;                    // End simulation
+    end
+endmodule

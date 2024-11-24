@@ -1,0 +1,77 @@
+module cyclic_lamp(clock, light);
+    input clock;               // Clock input to drive the FSM
+    output reg [2:0] light;    // 3-bit light output (RED, GREEN, YELLOW)
+
+    // State definitions (2 bits for state)
+    parameter s0 = 2'b00, 
+              s1 = 2'b01, 
+              s2 = 2'b10;
+              
+    // Light color definitions (3-bit encoding)
+    parameter RED = 3'b100, 
+              GREEN = 3'b010, 
+              YELLOW = 3'b001;
+
+    reg [1:0] state;            // 2-bit state register (tracks current state)
+    reg [27:0] count = 0;       // Counter for clock division
+    reg clock_out;              // Slower clock output used for state transitions
+
+    // Clock divider logic: create a slower clock from the main clock
+    always @(posedge clock) begin
+        count <= count + 1;
+        if (count == 100000000) begin
+            count <= 0;
+            clock_out = ~clock_out; // Toggle the clock_out signal every 100 million clock cycles
+        end
+    end
+
+    // State transition logic on the rising edge of clock_out
+    always @(posedge clock_out) begin
+        case (state)
+            s0: state <= s1;   // RED to GREEN
+            s1: state <= s2;   // GREEN to YELLOW
+            s2: state <= s0;   // YELLOW to RED
+            default: state <= s0; // Default to RED
+        endcase
+    end
+
+    // Light color logic based on current state
+    always @(state) begin
+        case(state)
+            s0: light = RED;        // RED light for state s0
+            s1: light = GREEN;      // GREEN light for state s1
+            s2: light = YELLOW;     // YELLOW light for state s2
+            default: light = RED;   // Default to RED light
+        endcase
+    end
+endmodule
+
+`timescale 1ns / 1ps
+
+module STIMULUS;
+    reg clock;                    // Clock input for the cyclic lamp FSM
+    wire [2:0] light;             // Wire to capture the output light color
+
+    // Instantiate the cyclic_lamp module
+    cyclic_lamp uut (
+        .clock(clock), 
+        .light(light)
+    );
+
+    // Generate a clock signal (period of 10ns)
+    initial begin
+        clock = 0;
+        forever #5 clock = ~clock; // Toggle clock every 5ns
+    end
+
+    // Monitor and print the light output at each time step
+    initial begin
+        $monitor("Time=%0t | light=%b", $time, light);
+    end
+
+    // Run the simulation for a large enough time (to observe all states)
+    initial begin
+        #1000000000;  // Simulate for 1 billion time units
+        $finish;       // End the simulation
+    end
+endmodule

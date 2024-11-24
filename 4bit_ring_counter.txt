@@ -1,0 +1,38 @@
+module RingCounter_4bit (
+    input clk,           // Clock signal
+    input rst,           // Reset signal
+    output reg [3:0] q   // 4-bit output for the counter state
+);
+    always @(posedge clk or posedge rst) begin
+        if (rst)
+            q <= 4'b1000;           // Initialize with a single '1'
+        else
+            q <= {q[2:0], q[3]};    // Circular left shift
+    end
+endmodule
+
+
+module tb_RingCounter_4bit();
+    reg clk, rst;          // Test bench inputs
+    wire [3:0] q;          // Counter output
+
+    // Instantiate the RingCounter module
+    RingCounter_4bit uut (
+        .clk(clk),
+        .rst(rst),
+        .q(q)
+    );
+
+    // Generate clock signal
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;      // Toggle clock every 5 time units
+    end
+
+    // Apply test cases
+    initial begin
+        rst = 1; #10;               // Reset the counter
+        rst = 0; #50;               // Observe the counter's operation
+        $finish;                    // End simulation
+    end
+endmodule

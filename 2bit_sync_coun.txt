@@ -1,0 +1,37 @@
+module SynchronousCounter_2bit (
+    input clk,           // Clock signal
+    input rst,           // Reset signal
+    output reg [1:0] q   // 2-bit output for the counter
+);
+    always @(posedge clk or posedge rst) begin
+        if (rst)
+            q <= 2'b00;          // Reset counter to 0
+        else
+            q <= q + 1;          // Increment counter
+    end
+endmodule
+
+module tb_SynchronousCounter_2bit();
+    reg clk, rst;           // Test bench inputs
+    wire [1:0] q;           // Counter output
+
+    // Instantiate the SynchronousCounter module
+    SynchronousCounter_2bit uut (
+        .clk(clk),
+        .rst(rst),
+        .q(q)
+    );
+
+    // Generate clock signal
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;   // Toggle clock every 5 time units
+    end
+
+    // Apply test cases
+    initial begin
+        rst = 1; #10;            // Apply reset for 10 time units
+        rst = 0; #50;            // Observe counter operation for 50 time units
+        $finish;                 // End simulation
+    end
+endmodule

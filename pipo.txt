@@ -1,0 +1,43 @@
+module PIPO_4bit (
+    input clk,                  // Clock signal
+    input rst,                  // Reset signal
+    input [3:0] parallel_in,    // Parallel input data
+    output reg [3:0] parallel_out // Parallel output
+);
+    always @(posedge clk or posedge rst) begin
+        if (rst)
+            parallel_out <= 4'b0000;      // Clear register to 0 on reset
+        else
+            parallel_out <= parallel_in; // Load parallel input into output
+    end
+endmodule
+
+
+module tb_PIPO_4bit();
+    reg clk, rst;                 // Test bench inputs
+    reg [3:0] parallel_in;        // Parallel input
+    wire [3:0] parallel_out;      // Parallel output
+
+    // Instantiate the PIPO module
+    PIPO_4bit uut (
+        .clk(clk),
+        .rst(rst),
+        .parallel_in(parallel_in),
+        .parallel_out(parallel_out)
+    );
+
+    // Generate clock signal
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;     // Toggle clock every 5 time units
+    end
+
+    // Apply test cases
+    initial begin
+        rst = 1; parallel_in = 4'b0000; #10;  // Reset register
+        rst = 0; parallel_in = 4'b1011; #10;  // Load 1011 into register
+        parallel_in = 4'b0101; #10;           // Load 0101 into register
+        parallel_in = 4'b1110; #10;           // Load 1110 into register
+        $finish;                              // End simulation
+    end
+endmodule
